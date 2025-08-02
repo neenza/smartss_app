@@ -1,6 +1,7 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ScreenshotDetailScreen extends StatefulWidget {
   final List<ScreenshotDetailData> screenshots;
@@ -49,8 +50,14 @@ class _ScreenshotDetailScreenState extends State<ScreenshotDetailScreen> {
     final current = widget.screenshots[_currentIndex];
     return GestureDetector(
       onVerticalDragUpdate: (details) {
-        if (details.primaryDelta != null && details.primaryDelta! > 8) {
-          Navigator.of(context).pop();
+        if (details.primaryDelta != null) {
+          if (details.primaryDelta! > 8) {
+            Navigator.of(context).pop();
+          } else if (details.primaryDelta! < -8) {
+            // Swipe up to share
+            final current = widget.screenshots[_currentIndex];
+            Share.shareXFiles([XFile(current.imageFile.path)], text: current.appName ?? 'Screenshot');
+          }
         }
       },
       child: Scaffold(
