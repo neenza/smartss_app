@@ -1,12 +1,14 @@
 // FILE: lib/services/screenshot_service.dart
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:screenshot_manager/models/screenshot_info.dart';
 import 'package:screenshot_manager/settings_provider.dart';
-import 'package:device_apps/device_apps.dart';
+// import 'package:device_apps/device_apps.dart';
 
 // Provider to fetch screenshots, handling async state and errors.
 final screenshotProvider = FutureProvider<List<ScreenshotInfo>>((ref) async {
@@ -18,7 +20,33 @@ final screenshotProvider = FutureProvider<List<ScreenshotInfo>>((ref) async {
 final screenshotServiceProvider = Provider((ref) => ScreenshotService());
 
 
+class AppInfo {
+  final String appName;
+  final String packageName;
+  final String? iconBase64;
+
+  AppInfo({
+    required this.appName,
+    required this.packageName,
+    this.iconBase64,
+  });
+}
+
 class ScreenshotService {
+  static const platform = MethodChannel('app.package/resolve');
+
+  Future<AppInfo> getAppInfo(String packageName) async {
+    try {
+      final result = await platform.invokeMethod('getAppInfo', {'package': packageName});
+      return AppInfo(
+        appName: result['appName'] ?? packageName,
+        packageName: packageName,
+        iconBase64: result['iconBase64'],
+      );
+    } catch (e) {
+      return AppInfo(appName: packageName, packageName: packageName);
+    }
+  }
   // Fallback icons for unknown apps
   // Removed unused _defaultIcon field
 
@@ -66,21 +94,6 @@ class ScreenshotService {
       throw Exception('Directory not found: $path. Please check the path in Settings.');
     }
 
-    // Fetch all installed apps once and build a lookup map (with icons)
-    Map<String, dynamic> installedAppsMap = {};
-    try {
-      final installedApps = await DeviceApps.getInstalledApplications(
-        includeAppIcons: true,
-        includeSystemApps: true,
-      );
-      for (var app in installedApps) {
-        installedAppsMap[app.packageName] = app;
-      }
-    } catch (e) {
-      // If fetching installed apps fails, fallback to empty map
-      installedAppsMap = {};
-    }
-
     final List<ScreenshotInfo> screenshots = [];
     final regex = RegExp(r'Screenshot_(\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-\d{3})_(.*)\.(jpg|png)');
     final files = await directory.list().toList();
@@ -96,23 +109,21 @@ class ScreenshotService {
 
           try {
             final timestamp = DateFormat('yyyy-MM-dd-HH-mm-ss-SSS').parse(timestampStr!);
-            String appName = packageName; // fallback to package name
+            AppInfo appInfo = await getAppInfo(packageName);
             Uint8List? appIconBytes;
-            if (installedAppsMap.containsKey(packageName)) {
-              final app = installedAppsMap[packageName];
-              appName = app.appName ?? packageName;
-              if (app is ApplicationWithIcon) {
-                appIconBytes = app.icon;
+            if (appInfo.iconBase64 != null) {
+              try {
+                appIconBytes = base64Decode(appInfo.iconBase64!);
+              } catch (_) {
+                appIconBytes = null;
               }
-            } else {
-              appName = packageName; // fallback to package name
             }
             screenshots.add(
               ScreenshotInfo(
                 file: fileEntity,
                 timestamp: timestamp,
                 packageName: packageName,
-                appName: appName,
+                appName: appInfo.appName,
                 appIconBytes: appIconBytes,
               ),
             );
