@@ -25,9 +25,19 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/app_icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/app_icon.png
+  min_sdk_android: 21
 
 # IMPORTANT: For Android 10 (API 29) and above, you must add this to your
 # android/app/src/main/AndroidManifest.xml inside the <application> tag
