@@ -123,12 +123,10 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.calendar_view_day),
             title: const Text('Show Day Section Header'),
-            trailing: Checkbox(
+            trailing: Switch(
               value: settings.showDaySectionHeader,
               onChanged: (value) {
-                if (value != null) {
-                  ref.read(settingsProvider.notifier).setShowDaySectionHeader(value);
-                }
+                ref.read(settingsProvider.notifier).setShowDaySectionHeader(value);
               },
             ),
           ),
