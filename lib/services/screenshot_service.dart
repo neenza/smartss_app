@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:screenshot_manager/models/screenshot_info.dart';
 import 'package:screenshot_manager/settings_provider.dart';
-// import 'package:device_apps/device_apps.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Provider to fetch screenshots, handling async state and errors.
 final screenshotProvider = FutureProvider<List<ScreenshotInfo>>((ref) async {
@@ -34,21 +34,59 @@ class AppInfo {
 
 class ScreenshotService {
   static const platform = MethodChannel('app.package/resolve');
+  static const _prefsKey = 'appInfoCache';
+
+  final Map<String, AppInfo> _appInfoCache = {};
+  bool _cacheLoaded = false;
+
+  Future<void> _loadCache() async {
+    if (_cacheLoaded) return;
+    final prefs = await SharedPreferences.getInstance();
+    final cacheJson = prefs.getString(_prefsKey);
+    if (cacheJson != null) {
+      final Map<String, dynamic> decoded = jsonDecode(cacheJson);
+      decoded.forEach((pkg, info) {
+        _appInfoCache[pkg] = AppInfo(
+          appName: info['appName'],
+          packageName: pkg,
+          iconBase64: info['iconBase64'],
+        );
+      });
+    }
+    _cacheLoaded = true;
+  }
+
+  Future<void> _saveCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cacheMap = _appInfoCache.map((pkg, info) => MapEntry(pkg, {
+      'appName': info.appName,
+      'iconBase64': info.iconBase64,
+    }));
+    await prefs.setString(_prefsKey, jsonEncode(cacheMap));
+  }
 
   Future<AppInfo> getAppInfo(String packageName) async {
+    await _loadCache();
+    if (_appInfoCache.containsKey(packageName)) {
+      return _appInfoCache[packageName]!;
+    }
     try {
       final result = await platform.invokeMethod('getAppInfo', {'package': packageName});
-      return AppInfo(
+      final info = AppInfo(
         appName: result['appName'] ?? packageName,
         packageName: packageName,
         iconBase64: result['iconBase64'],
       );
+      _appInfoCache[packageName] = info;
+      await _saveCache();
+      return info;
     } catch (e) {
-      return AppInfo(appName: packageName, packageName: packageName);
+      final info = AppInfo(appName: packageName, packageName: packageName);
+      _appInfoCache[packageName] = info;
+      await _saveCache();
+      return info;
     }
   }
-  // Fallback icons for unknown apps
-  // Removed unused _defaultIcon field
 
   Future<bool> _requestPermission() async {
     // ...existing code...
@@ -88,6 +126,8 @@ class ScreenshotService {
     if (!await _requestPermission()) {
       throw Exception('Storage permission was denied.');
     }
+
+    await _loadCache();
 
     final directory = Directory(path);
     if (!await directory.exists()) {
