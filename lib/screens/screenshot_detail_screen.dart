@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class ScreenshotDetailScreen extends StatelessWidget {
   final File imageFile;
   final DateTime timestamp;
+  final String? appName;
 
   const ScreenshotDetailScreen({
     super.key,
     required this.imageFile,
     required this.timestamp,
+    this.appName,
   });
 
   @override
@@ -19,6 +21,14 @@ class ScreenshotDetailScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        title: appName != null
+            ? Text(
+                appName!,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                overflow: TextOverflow.ellipsis,
+              )
+            : null,
+        centerTitle: true,
       ),
       body: Center(
         child: Hero(

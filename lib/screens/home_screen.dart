@@ -104,6 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   return ScreenshotGridItem(
                     imageFile: screenshot.file,
                     timestamp: screenshot.timestamp,
+                    appName: screenshot.appName,
                   );
                 },
               ),
@@ -150,6 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               return ScreenshotGridItem(
                                 imageFile: shot.file,
                                 timestamp: shot.timestamp,
+                                appName: shot.appName,
                               );
                             },
                           ),

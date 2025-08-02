@@ -6,11 +6,13 @@ import 'package:screenshot_manager/screens/screenshot_detail_screen.dart';
 class ScreenshotGridItem extends StatelessWidget {
   final File imageFile;
   final DateTime timestamp;
+  final String? appName;
 
   const ScreenshotGridItem({
     super.key,
     required this.imageFile,
     required this.timestamp,
+    this.appName,
   });
 
   @override
@@ -22,6 +24,7 @@ class ScreenshotGridItem extends StatelessWidget {
             builder: (_) => ScreenshotDetailScreen(
               imageFile: imageFile,
               timestamp: timestamp,
+              appName: appName,
             ),
           ),
         );

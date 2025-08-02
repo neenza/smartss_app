@@ -62,6 +62,7 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
             return ScreenshotGridItem(
               imageFile: shot.file,
               timestamp: shot.timestamp,
+              appName: shot.appName,
             );
           },
         ),
@@ -99,6 +100,7 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
                   return ScreenshotGridItem(
                     imageFile: shot.file,
                     timestamp: shot.timestamp,
+                    appName: shot.appName,
                   );
                 },
                 childCount: grouped[dayKeys[i]]!.length,
