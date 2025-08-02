@@ -13,6 +13,7 @@ class HomeScaffold extends StatefulWidget {
 
 class _HomeScaffoldState extends State<HomeScaffold> {
   int _selectedIndex = 0;
+  late PageController _pageController;
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -20,9 +21,16 @@ class _HomeScaffoldState extends State<HomeScaffold> {
     const SettingsScreen(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.ease);
     });
   }
 
@@ -30,9 +38,14 @@ class _HomeScaffoldState extends State<HomeScaffold> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
+      body: PageView(
+        controller: _pageController,
         children: _screens,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
