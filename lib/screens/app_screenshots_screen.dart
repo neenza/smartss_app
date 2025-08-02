@@ -92,22 +92,7 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
     );
   }
 
-  String _sortableDate(String dayKey) {
-    // Convert 'Jul 30' to '2025-07-30' for sorting
-    final parts = dayKey.split(' ');
-    final month = _monthShortToInt(parts[0]);
-    final day = int.parse(parts[1]);
-    final year = DateTime.now().year; // Assume current year
-    return '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
-  }
 
-  int _monthShortToInt(String short) {
-    const months = {
-      'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
-      'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
-    };
-    return months[short] ?? 1;
-  }
 }
 
 

@@ -45,6 +45,18 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Grid Aspect Ratio'),
             trailing: _buildAspectRatioDropdown(context, ref),
           ),
+          ListTile(
+            leading: const Icon(Icons.calendar_view_day),
+            title: const Text('Show Day Section Header'),
+            trailing: Checkbox(
+              value: settings.showDaySectionHeader,
+              onChanged: (value) {
+                if (value != null) {
+                  ref.read(settingsProvider.notifier).setShowDaySectionHeader(value);
+                }
+              },
+            ),
+          ),
           const Divider(height: 32, indent: 16, endIndent: 16),
           _buildSectionHeader(context, 'STORAGE & CLEANUP'),
           ListTile(
@@ -144,7 +156,7 @@ class SettingsScreen extends ConsumerWidget {
                 final newPath = controller.text;
                 if (newPath.isNotEmpty) {
                   ref.read(settingsProvider.notifier).setScreenshotPath(newPath);
-                  ref.refresh(screenshotProvider); // Refresh data after path change
+                  final _ = ref.refresh(screenshotProvider); // Refresh data after path change
                 }
                 Navigator.pop(context);
               },
