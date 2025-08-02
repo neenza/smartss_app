@@ -1,6 +1,6 @@
 // FILE: lib/services/screenshot_service.dart
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -20,7 +20,7 @@ final screenshotServiceProvider = Provider((ref) => ScreenshotService());
 
 class ScreenshotService {
   // Fallback icons for unknown apps
-  static const IconData _defaultIcon = Icons.apps_rounded;
+  // Removed unused _defaultIcon field
 
   Future<bool> _requestPermission() async {
     // ...existing code...
@@ -66,10 +66,13 @@ class ScreenshotService {
       throw Exception('Directory not found: $path. Please check the path in Settings.');
     }
 
-    // Fetch all installed apps once and build a lookup map
+    // Fetch all installed apps once and build a lookup map (with icons)
     Map<String, dynamic> installedAppsMap = {};
     try {
-      final installedApps = await DeviceApps.getInstalledApplications(includeAppIcons: false, includeSystemApps: true);
+      final installedApps = await DeviceApps.getInstalledApplications(
+        includeAppIcons: true,
+        includeSystemApps: true,
+      );
       for (var app in installedApps) {
         installedAppsMap[app.packageName] = app;
       }
@@ -94,12 +97,13 @@ class ScreenshotService {
           try {
             final timestamp = DateFormat('yyyy-MM-dd-HH-mm-ss-SSS').parse(timestampStr!);
             String appName = packageName; // fallback to package name
-            IconData appIcon = _defaultIcon;
+            Uint8List? appIconBytes;
             if (installedAppsMap.containsKey(packageName)) {
               final app = installedAppsMap[packageName];
               appName = app.appName ?? packageName;
-              // device_apps only provides icon as bytes, not IconData
-              // You may want to display Image.memory(app.icon) elsewhere
+              if (app is ApplicationWithIcon) {
+                appIconBytes = app.icon;
+              }
             } else {
               appName = packageName; // fallback to package name
             }
@@ -109,7 +113,7 @@ class ScreenshotService {
                 timestamp: timestamp,
                 packageName: packageName,
                 appName: appName,
-                appIcon: appIcon,
+                appIconBytes: appIconBytes,
               ),
             );
           } catch (e) {

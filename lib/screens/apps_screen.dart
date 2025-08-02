@@ -55,10 +55,15 @@ class AppsScreen extends ConsumerWidget {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   leading: CircleAvatar(
                     backgroundColor: theme.colorScheme.primaryContainer,
-                    child: Icon(
-                      firstScreenshot.appIcon,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
+                    child: firstScreenshot.appIconBytes != null
+                      ? Image.memory(
+                          firstScreenshot.appIconBytes!,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.apps_rounded,
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
                   ),
                   title: Text(firstScreenshot.appName, style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text('$count screenshot${count > 1 ? 's' : ''}'),
