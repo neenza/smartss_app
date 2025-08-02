@@ -32,9 +32,7 @@ class SettingsScreen extends ConsumerWidget {
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(8),
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey.shade800
-                          : Colors.grey.shade50,
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
                     child: DropdownButtonHideUnderline(
@@ -70,12 +68,10 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.grid_view_rounded),
             title: const Text('Grid Size'),
             trailing: Container(
-              decoration: BoxDecoration(
+                decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(8),
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey.shade800
-                    : Colors.grey.shade50,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
               child: DropdownButtonHideUnderline(
@@ -103,9 +99,7 @@ class SettingsScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(8),
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey.shade800
-                    : Colors.grey.shade50,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
               child: DropdownButtonHideUnderline(
@@ -142,13 +136,6 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Screenshot Folder'),
             subtitle: Text(settings.screenshotPath),
             onTap: () => _showEditPathDialog(context, ref),
-          ),
-          const Divider(indent: 16, endIndent: 16),
-          ListTile(
-            leading: const Icon(Icons.storage_rounded),
-            title: const Text('Storage Used'),
-            subtitle: const Text('Tap to calculate'), // Dynamic calculation is complex
-            onTap: () {},
           ),
           const Divider(indent: 16, endIndent: 16),
           ListTile(
