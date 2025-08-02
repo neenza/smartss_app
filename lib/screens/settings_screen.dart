@@ -26,25 +26,100 @@ class SettingsScreen extends ConsumerWidget {
           _buildSectionHeader(context, 'APPEARANCE'),
           ListTile(
             leading: Icon(isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
-            title: const Text('Dark Mode'),
-            trailing: Switch(
-              value: isDarkMode,
-              onChanged: (value) {
-                final newMode = value ? ThemeMode.dark : ThemeMode.light;
-                ref.read(themeProvider.notifier).setThemeMode(newMode);
-              },
+            title: const Text('Display Mode'),
+            trailing: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey.shade50,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<ThemeType>(
+                  value: themeNotifier.themeType,
+                  isDense: true,
+                  items: [
+                    DropdownMenuItem<ThemeType>(
+                      value: ThemeType.light,
+                      child: const Text('Light'),
+                    ),
+                    DropdownMenuItem<ThemeType>(
+                      value: ThemeType.dark,
+                      child: const Text('Dark'),
+                    ),
+                  ],
+                  onChanged: (type) {
+                    if (type != null) {
+                      ref.read(themeProvider.notifier).setThemeType(type);
+                    }
+                  },
+                ),
+              ),
             ),
           ),
+          const Divider(indent: 16, endIndent: 16),
           ListTile(
             leading: const Icon(Icons.grid_view_rounded),
             title: const Text('Grid Size'),
-            trailing: _buildGridSizeDropdown(context, ref),
+            trailing: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey.shade50,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: themeNotifier.gridColumns,
+                  isDense: true,
+                  items: const [
+                    DropdownMenuItem(value: 2, child: Text('2 Columns')),
+                    DropdownMenuItem(value: 3, child: Text('3 Columns')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(themeProvider.notifier).setGridColumns(value);
+                    }
+                  },
+                ),
+              ),
+            ),
           ),
+          const Divider(indent: 16, endIndent: 16),
           ListTile(
             leading: const Icon(Icons.aspect_ratio),
             title: const Text('Grid Aspect Ratio'),
-            trailing: _buildAspectRatioDropdown(context, ref),
+            trailing: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey.shade50,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<double>(
+                  value: settings.aspectRatio,
+                  isDense: true,
+                  items: const [
+                    DropdownMenuItem(value: 1.0, child: Text('Square (1:1)')),
+                    DropdownMenuItem(value: 0.45, child: Text('Rectangle (9:20)')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(settingsProvider.notifier).setAspectRatio(value);
+                    }
+                  },
+                ),
+              ),
+            ),
           ),
+          const Divider(indent: 16, endIndent: 16),
           ListTile(
             leading: const Icon(Icons.calendar_view_day),
             title: const Text('Show Day Section Header'),
@@ -57,7 +132,6 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
           ),
-          const Divider(height: 32, indent: 16, endIndent: 16),
           _buildSectionHeader(context, 'STORAGE & CLEANUP'),
           ListTile(
             leading: const Icon(Icons.folder_rounded),
@@ -65,12 +139,14 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: Text(settings.screenshotPath),
             onTap: () => _showEditPathDialog(context, ref),
           ),
+          const Divider(indent: 16, endIndent: 16),
           ListTile(
             leading: const Icon(Icons.storage_rounded),
             title: const Text('Storage Used'),
             subtitle: const Text('Tap to calculate'), // Dynamic calculation is complex
             onTap: () {},
           ),
+          const Divider(indent: 16, endIndent: 16),
           ListTile(
             leading: const Icon(Icons.security_rounded),
             title: const Text('Request Storage Permission'),
@@ -116,8 +192,6 @@ class SettingsScreen extends ConsumerWidget {
               );
             },
           ),
-          const Divider(height: 32, indent: 16, endIndent: 16),
-          const Divider(height: 32, indent: 16, endIndent: 16),
           _buildSectionHeader(context, 'ABOUT'),
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),
@@ -184,53 +258,4 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildGridSizeDropdown(BuildContext context, WidgetRef ref) {
-    final themeNotifier = ref.watch(themeProvider);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int>(
-          value: themeNotifier.gridColumns,
-          items: const [
-            DropdownMenuItem(value: 2, child: Text('2 Columns')),
-            DropdownMenuItem(value: 3, child: Text('3 Columns')),
-          ],
-          onChanged: (value) {
-            if (value != null) {
-              ref.read(themeProvider.notifier).setGridColumns(value);
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAspectRatioDropdown(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsProvider);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<double>(
-          value: settings.aspectRatio,
-          items: const [
-            DropdownMenuItem(value: 1.0, child: Text('Square (1:1)')),
-            DropdownMenuItem(value: 0.45, child: Text('Rectangle (9:20)')),
-          ],
-          onChanged: (value) {
-            if (value != null) {
-              ref.read(settingsProvider.notifier).setAspectRatio(value);
-            }
-          },
-        ),
-      ),
-    );
-  }
 }
