@@ -27,37 +27,43 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: Icon(isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
             title: const Text('Display Mode'),
-            trailing: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey.shade800
-                    : Colors.grey.shade50,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<ThemeType>(
-                  value: themeNotifier.themeType,
-                  isDense: true,
-                  items: [
-                    DropdownMenuItem<ThemeType>(
-                      value: ThemeType.light,
-                      child: const Text('Light'),
+            trailing: themeNotifier.isLoaded
+                ? Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey.shade800
+                          : Colors.grey.shade50,
                     ),
-                    DropdownMenuItem<ThemeType>(
-                      value: ThemeType.dark,
-                      child: const Text('Dark'),
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<ThemeType>(
+                        value: themeNotifier.themeType,
+                        isDense: true,
+                        items: [
+                          DropdownMenuItem<ThemeType>(
+                            value: ThemeType.light,
+                            child: const Text('Light'),
+                          ),
+                          DropdownMenuItem<ThemeType>(
+                            value: ThemeType.dark,
+                            child: const Text('Dark'),
+                          ),
+                        ],
+                        onChanged: (type) {
+                          if (type != null) {
+                            ref.read(themeProvider.notifier).setThemeType(type);
+                          }
+                        },
+                      ),
                     ),
-                  ],
-                  onChanged: (type) {
-                    if (type != null) {
-                      ref.read(themeProvider.notifier).setThemeType(type);
-                    }
-                  },
-                ),
-              ),
-            ),
+                  )
+                : const SizedBox(
+                    width: 48,
+                    height: 24,
+                    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  ),
           ),
           const Divider(indent: 16, endIndent: 16),
           ListTile(
