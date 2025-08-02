@@ -9,11 +9,13 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
   final List<ScreenshotInfo> screenshots;
   final int gridColumns;
   final double aspectRatio;
+  final bool showDaySectionHeader;
 
   const _GroupedScreenshotsGrid({
     required this.screenshots,
     required this.gridColumns,
     required this.aspectRatio,
+    required this.showDaySectionHeader,
   });
 
   Map<DateTime, List<ScreenshotInfo>> _groupByDay(List<ScreenshotInfo> shots) {
@@ -43,6 +45,29 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!showDaySectionHeader) {
+      // Flat grid
+      return Scrollbar(
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16.0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: gridColumns,
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
+            childAspectRatio: aspectRatio,
+          ),
+          itemCount: screenshots.length,
+          itemBuilder: (context, index) {
+            final shot = screenshots[index];
+            return ScreenshotGridItem(
+              imageFile: shot.file,
+              timestamp: shot.timestamp,
+            );
+          },
+        ),
+      );
+    }
+    // Grouped by day
     final grouped = _groupByDay(screenshots);
     final dayKeys = grouped.keys.toList()
       ..sort((a, b) => b.compareTo(a)); // Descending by date
@@ -110,6 +135,7 @@ class AppScreenshotsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gridColumns = ref.watch(themeProvider).gridColumns;
     final aspectRatio = ref.watch(settingsProvider).aspectRatio;
+    final showDaySectionHeader = ref.watch(settingsProvider).showDaySectionHeader;
     return Scaffold(
       appBar: AppBar(
         title: Text(appName),
@@ -118,6 +144,7 @@ class AppScreenshotsScreen extends ConsumerWidget {
         screenshots: screenshots,
         gridColumns: gridColumns,
         aspectRatio: aspectRatio,
+        showDaySectionHeader: showDaySectionHeader,
       ),
     );
   }
