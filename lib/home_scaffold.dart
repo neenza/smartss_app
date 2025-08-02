@@ -48,7 +48,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
         },
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           border: Border(
@@ -57,7 +57,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
         ),
         child: SafeArea(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               _buildNavItem(context, Icons.home_filled, 'Home', 0),
               _buildNavItem(context, Icons.apps_rounded, 'Apps', 1),
@@ -72,34 +72,35 @@ class _HomeScaffoldState extends State<HomeScaffold> {
   Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
     final theme = Theme.of(context);
     final isSelected = _selectedIndex == index;
-    final color = isSelected ? theme.colorScheme.primary : Colors.grey.shade600;
+    final color = isSelected ? theme.colorScheme.primary : Colors.grey.shade700;
 
-    return InkWell(
-      onTap: () => _onItemTapped(index),
-      borderRadius: BorderRadius.circular(30),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
+    return Expanded(
+      child: InkWell(
+        onTap: () => _onItemTapped(index),
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color),
-            if (isSelected) const SizedBox(width: 8),
-            if (isSelected)
-              AnimatedOpacity(
-                opacity: isSelected ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 200),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 28),
+              decoration: isSelected
+                  ? BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    )
+                  : null,
+              child: Icon(icon, color: color, size: 28),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
               ),
+            ),
           ],
         ),
       ),
