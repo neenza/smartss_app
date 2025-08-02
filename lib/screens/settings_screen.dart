@@ -210,7 +210,7 @@ class SettingsScreen extends ConsumerWidget {
           value: settings.aspectRatio,
           items: const [
             DropdownMenuItem(value: 1.0, child: Text('Square (1:1)')),
-            DropdownMenuItem(value: 2.22, child: Text('Rectangle (20:9)')),
+            DropdownMenuItem(value: 0.45, child: Text('Rectangle (9:20)')),
           ],
           onChanged: (value) {
             if (value != null) {

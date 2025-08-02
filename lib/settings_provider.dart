@@ -11,7 +11,7 @@ final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>(
 @immutable
 class SettingsState {
   final String screenshotPath;
-  final double aspectRatio; // 1.0 for square, 2.22 for 20:9
+  final double aspectRatio; // 1.0 for square, 0.45 for 9:20 (portrait)
 
   const SettingsState({required this.screenshotPath, required this.aspectRatio});
 

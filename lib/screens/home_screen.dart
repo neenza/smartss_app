@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:screenshot_manager/services/screenshot_service.dart';
 import 'package:screenshot_manager/theme_provider.dart';
+import 'package:screenshot_manager/settings_provider.dart';
 import 'package:screenshot_manager/widgets/screenshot_grid_item.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -12,6 +13,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final screenshotsAsync = ref.watch(screenshotProvider);
     final gridColumns = ref.watch(themeProvider).gridColumns;
+    final aspectRatio = ref.watch(settingsProvider).aspectRatio;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -38,6 +40,7 @@ class HomeScreen extends ConsumerWidget {
                 crossAxisCount: gridColumns,
                 crossAxisSpacing: 16.0,
                 mainAxisSpacing: 16.0,
+                childAspectRatio: aspectRatio,
               ),
               itemCount: screenshots.length,
               itemBuilder: (context, index) {
