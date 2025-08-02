@@ -5,8 +5,15 @@ import 'package:screenshot_manager/models/screenshot_info.dart';
 import 'package:screenshot_manager/screens/app_screenshots_screen.dart';
 import 'package:screenshot_manager/services/screenshot_service.dart';
 
-class AppsScreen extends ConsumerWidget {
+class AppsScreen extends ConsumerStatefulWidget {
   const AppsScreen({super.key});
+
+  @override
+  ConsumerState<AppsScreen> createState() => _AppsScreenState();
+}
+
+class _AppsScreenState extends ConsumerState<AppsScreen> {
+  String _searchQuery = '';
 
   Map<String, List<ScreenshotInfo>> _groupScreenshotsByApp(List<ScreenshotInfo> screenshots) {
     final Map<String, List<ScreenshotInfo>> grouped = {};
@@ -20,7 +27,7 @@ class AppsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final screenshotsAsync = ref.watch(screenshotProvider);
     final theme = Theme.of(context);
 
@@ -28,21 +35,50 @@ class AppsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Screenshots by App'),
         centerTitle: false,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search apps...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: theme.colorScheme.surface,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+          ),
+        ),
       ),
       body: screenshotsAsync.when(
         data: (allScreenshots) {
           final groupedByApp = _groupScreenshotsByApp(allScreenshots);
           final appKeys = groupedByApp.keys.toList();
+          final filteredAppKeys = _searchQuery.isEmpty
+              ? appKeys
+              : appKeys.where((key) {
+                  final appName = groupedByApp[key]!.first.appName;
+                  return appName.toLowerCase().contains(_searchQuery.toLowerCase());
+                }).toList();
 
-          if (appKeys.isEmpty) {
-            return const Center(child: Text('No screenshots found to group.'));
+          if (filteredAppKeys.isEmpty) {
+            return const Center(child: Text('No apps found.'));
           }
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            itemCount: appKeys.length,
+            itemCount: filteredAppKeys.length,
             itemBuilder: (context, index) {
-              final packageName = appKeys[index];
+              final packageName = filteredAppKeys[index];
               final screenshots = groupedByApp[packageName]!;
               final firstScreenshot = screenshots.first;
               final count = screenshots.length;
