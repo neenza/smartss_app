@@ -40,6 +40,11 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Grid Size'),
             trailing: _buildGridSizeDropdown(context, ref),
           ),
+          ListTile(
+            leading: const Icon(Icons.aspect_ratio),
+            title: const Text('Grid Aspect Ratio'),
+            trailing: _buildAspectRatioDropdown(context, ref),
+          ),
           const Divider(height: 32, indent: 16, endIndent: 16),
           _buildSectionHeader(context, 'STORAGE & CLEANUP'),
           ListTile(
@@ -185,6 +190,31 @@ class SettingsScreen extends ConsumerWidget {
           onChanged: (value) {
             if (value != null) {
               ref.read(themeProvider.notifier).setGridColumns(value);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAspectRatioDropdown(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<double>(
+          value: settings.aspectRatio,
+          items: const [
+            DropdownMenuItem(value: 1.0, child: Text('Square (1:1)')),
+            DropdownMenuItem(value: 2.22, child: Text('Rectangle (20:9)')),
+          ],
+          onChanged: (value) {
+            if (value != null) {
+              ref.read(settingsProvider.notifier).setAspectRatio(value);
             }
           },
         ),

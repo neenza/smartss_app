@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:screenshot_manager/models/screenshot_info.dart';
 import 'package:screenshot_manager/theme_provider.dart';
+import 'package:screenshot_manager/settings_provider.dart';
 import 'package:screenshot_manager/widgets/screenshot_grid_item.dart';
 
 class AppScreenshotsScreen extends ConsumerWidget {
@@ -18,6 +19,7 @@ class AppScreenshotsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gridColumns = ref.watch(themeProvider).gridColumns;
+    final aspectRatio = ref.watch(settingsProvider).aspectRatio;
 
     return Scaffold(
       appBar: AppBar(
@@ -29,6 +31,7 @@ class AppScreenshotsScreen extends ConsumerWidget {
           crossAxisCount: gridColumns,
           crossAxisSpacing: 16.0,
           mainAxisSpacing: 16.0,
+          childAspectRatio: aspectRatio,
         ),
         itemCount: screenshots.length,
         itemBuilder: (context, index) {
