@@ -119,6 +119,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           final dayKeys = grouped.keys.toList();
           dayKeys.sort((a, b) => b.compareTo(a));
 
+          // Build a flat list of ScreenshotDetailData for global indexing
+          final allDetailData = filteredScreenshots.map((s) => ScreenshotDetailData(
+            imageFile: s.file,
+            timestamp: s.timestamp,
+            appName: s.appName,
+          )).toList();
+
           // Use SliverList for section headers and grids
           return CustomScrollView(
             slivers: [
@@ -151,13 +158,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             itemCount: grouped[day]!.length,
                             itemBuilder: (context, idx) {
                               final dayScreenshots = grouped[day]!;
+                              final shot = dayScreenshots[idx];
+                              final globalIdx = filteredScreenshots.indexOf(shot);
                               return ScreenshotGridItem(
-                                screenshots: dayScreenshots.map((s) => ScreenshotDetailData(
-                                  imageFile: s.file,
-                                  timestamp: s.timestamp,
-                                  appName: s.appName,
-                                )).toList(),
-                                index: idx,
+                                screenshots: allDetailData,
+                                index: globalIdx,
                               );
                             },
                           ),

@@ -76,6 +76,15 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
     final dayKeys = grouped.keys.toList()
       ..sort((a, b) => b.compareTo(a)); // Descending by date
 
+    // Build a flat list of ScreenshotDetailData for global indexing
+    final allDetailData = screenshots.map((s) => ScreenshotDetailData(
+      imageFile: s.file,
+      timestamp: s.timestamp,
+      appName: s.appName,
+    )).toList();
+
+    // Map each screenshot in grouped view to its global index
+    int globalIndex = 0;
     return CustomScrollView(
       slivers: [
         for (var i = 0; i < dayKeys.length; i++) ...[
@@ -100,13 +109,12 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, idx) {
                   final dayScreenshots = grouped[dayKeys[i]]!;
+                  // Find the global index of this screenshot
+                  final shot = dayScreenshots[idx];
+                  final globalIdx = screenshots.indexOf(shot);
                   return ScreenshotGridItem(
-                    screenshots: dayScreenshots.map((s) => ScreenshotDetailData(
-                      imageFile: s.file,
-                      timestamp: s.timestamp,
-                      appName: s.appName,
-                    )).toList(),
-                    index: idx,
+                    screenshots: allDetailData,
+                    index: globalIdx,
                   );
                 },
                 childCount: grouped[dayKeys[i]]!.length,
