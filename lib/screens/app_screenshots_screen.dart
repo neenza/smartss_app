@@ -5,6 +5,111 @@ import 'package:screenshot_manager/models/screenshot_info.dart';
 import 'package:screenshot_manager/theme_provider.dart';
 import 'package:screenshot_manager/settings_provider.dart';
 import 'package:screenshot_manager/widgets/screenshot_grid_item.dart';
+class _GroupedScreenshotsGrid extends StatelessWidget {
+  final List<ScreenshotInfo> screenshots;
+  final int gridColumns;
+  final double aspectRatio;
+
+  const _GroupedScreenshotsGrid({
+    required this.screenshots,
+    required this.gridColumns,
+    required this.aspectRatio,
+  });
+
+  Map<DateTime, List<ScreenshotInfo>> _groupByDay(List<ScreenshotInfo> shots) {
+    final Map<DateTime, List<ScreenshotInfo>> grouped = {};
+    for (var s in shots) {
+      final dateKey = DateTime(s.timestamp.year, s.timestamp.month, s.timestamp.day);
+      grouped.putIfAbsent(dateKey, () => []).add(s);
+    }
+    return grouped;
+  }
+
+  String _formatDate(DateTime dt) {
+    // Example: Jul 30 or Jul 30, 2024 if not current year
+    final now = DateTime.now();
+    final showYear = dt.year != now.year;
+    final monthShort = _monthShort(dt.month);
+    return showYear ? '$monthShort ${dt.day}, ${dt.year}' : '$monthShort ${dt.day}';
+  }
+
+  String _monthShort(int month) {
+    const months = [
+      '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return months[month];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final grouped = _groupByDay(screenshots);
+    final dayKeys = grouped.keys.toList()
+      ..sort((a, b) => b.compareTo(a)); // Descending by date
+
+    return CustomScrollView(
+      slivers: [
+        for (var i = 0; i < dayKeys.length; i++) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Text(
+                _formatDate(dayKeys[i]),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: gridColumns,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+                childAspectRatio: aspectRatio,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, idx) {
+                  final shot = grouped[dayKeys[i]]![idx];
+                  return ScreenshotGridItem(
+                    imageFile: shot.file,
+                    timestamp: shot.timestamp,
+                  );
+                },
+                childCount: grouped[dayKeys[i]]!.length,
+              ),
+            ),
+          ),
+          if (i < dayKeys.length - 1)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: Divider(thickness: 1.2),
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+
+  String _sortableDate(String dayKey) {
+    // Convert 'Jul 30' to '2025-07-30' for sorting
+    final parts = dayKey.split(' ');
+    final month = _monthShortToInt(parts[0]);
+    final day = int.parse(parts[1]);
+    final year = DateTime.now().year; // Assume current year
+    return '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
+  }
+
+  int _monthShortToInt(String short) {
+    const months = {
+      'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+      'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+    };
+    return months[short] ?? 1;
+  }
+}
+
 
 class AppScreenshotsScreen extends ConsumerWidget {
   final String appName;
@@ -20,27 +125,14 @@ class AppScreenshotsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gridColumns = ref.watch(themeProvider).gridColumns;
     final aspectRatio = ref.watch(settingsProvider).aspectRatio;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(appName),
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: gridColumns,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-          childAspectRatio: aspectRatio,
-        ),
-        itemCount: screenshots.length,
-        itemBuilder: (context, index) {
-          final screenshot = screenshots[index];
-          return ScreenshotGridItem(
-            imageFile: screenshot.file,
-            timestamp: screenshot.timestamp,
-          );
-        },
+      body: _GroupedScreenshotsGrid(
+        screenshots: screenshots,
+        gridColumns: gridColumns,
+        aspectRatio: aspectRatio,
       ),
     );
   }
