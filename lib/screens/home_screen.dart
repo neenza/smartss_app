@@ -155,10 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ),
                         if (i < dayKeys.length - 1)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                            child: Divider(thickness: 1.2),
-                          ),
+                          SizedBox(height: 16), // Add vertical whitespace between day sections
                       ],
                     );
                   },

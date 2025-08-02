@@ -107,10 +107,7 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
           ),
           if (i < dayKeys.length - 1)
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                child: Divider(thickness: 1.2),
-              ),
+              child: SizedBox(height: 16), // Add vertical whitespace between day sections
             ),
         ],
       ],
