@@ -1,30 +1,27 @@
 // FILE: lib/widgets/screenshot_grid_item.dart
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:screenshot_manager/screens/screenshot_detail_screen.dart';
 
 class ScreenshotGridItem extends StatelessWidget {
-  final File imageFile;
-  final DateTime timestamp;
-  final String? appName;
+  final List<ScreenshotDetailData> screenshots;
+  final int index;
 
   const ScreenshotGridItem({
     super.key,
-    required this.imageFile,
-    required this.timestamp,
-    this.appName,
+    required this.screenshots,
+    required this.index,
   });
 
   @override
   Widget build(BuildContext context) {
+    final shot = screenshots[index];
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => ScreenshotDetailScreen(
-              imageFile: imageFile,
-              timestamp: timestamp,
-              appName: appName,
+              screenshots: screenshots,
+              initialIndex: index,
             ),
           ),
         );
@@ -42,7 +39,7 @@ class ScreenshotGridItem extends StatelessWidget {
               ),
             ),
             child: Text(
-              '${timestamp.day}/${timestamp.month}, ${timestamp.hour}:${timestamp.minute.toString().padLeft(2, '0')}',
+              '${shot.timestamp.day}/${shot.timestamp.month}, ${shot.timestamp.hour}:${shot.timestamp.minute.toString().padLeft(2, '0')}',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
@@ -51,9 +48,9 @@ class ScreenshotGridItem extends StatelessWidget {
             ),
           ),
           child: Hero(
-            tag: imageFile.path,
+            tag: shot.imageFile.path,
             child: Image.file(
-              imageFile,
+              shot.imageFile,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(

@@ -5,6 +5,7 @@ import 'package:screenshot_manager/models/screenshot_info.dart';
 import 'package:screenshot_manager/theme_provider.dart';
 import 'package:screenshot_manager/settings_provider.dart';
 import 'package:screenshot_manager/widgets/screenshot_grid_item.dart';
+import 'package:screenshot_manager/screens/screenshot_detail_screen.dart';
 class _GroupedScreenshotsGrid extends StatelessWidget {
   final List<ScreenshotInfo> screenshots;
   final int gridColumns;
@@ -58,11 +59,13 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
           ),
           itemCount: screenshots.length,
           itemBuilder: (context, index) {
-            final shot = screenshots[index];
             return ScreenshotGridItem(
-              imageFile: shot.file,
-              timestamp: shot.timestamp,
-              appName: shot.appName,
+              screenshots: screenshots.map((s) => ScreenshotDetailData(
+                imageFile: s.file,
+                timestamp: s.timestamp,
+                appName: s.appName,
+              )).toList(),
+              index: index,
             );
           },
         ),
@@ -96,11 +99,14 @@ class _GroupedScreenshotsGrid extends StatelessWidget {
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, idx) {
-                  final shot = grouped[dayKeys[i]]![idx];
+                  final dayScreenshots = grouped[dayKeys[i]]!;
                   return ScreenshotGridItem(
-                    imageFile: shot.file,
-                    timestamp: shot.timestamp,
-                    appName: shot.appName,
+                    screenshots: dayScreenshots.map((s) => ScreenshotDetailData(
+                      imageFile: s.file,
+                      timestamp: s.timestamp,
+                      appName: s.appName,
+                    )).toList(),
+                    index: idx,
                   );
                 },
                 childCount: grouped[dayKeys[i]]!.length,

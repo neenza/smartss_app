@@ -6,6 +6,7 @@ import 'package:screenshot_manager/theme_provider.dart';
 import 'package:screenshot_manager/settings_provider.dart';
 import 'package:screenshot_manager/widgets/screenshot_grid_item.dart';
 import 'package:screenshot_manager/models/screenshot_info.dart';
+import 'package:screenshot_manager/screens/screenshot_detail_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -100,11 +101,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 itemCount: filteredScreenshots.length,
                 itemBuilder: (context, index) {
-                  final screenshot = filteredScreenshots[index];
                   return ScreenshotGridItem(
-                    imageFile: screenshot.file,
-                    timestamp: screenshot.timestamp,
-                    appName: screenshot.appName,
+                    screenshots: filteredScreenshots.map((s) => ScreenshotDetailData(
+                      imageFile: s.file,
+                      timestamp: s.timestamp,
+                      appName: s.appName,
+                    )).toList(),
+                    index: index,
                   );
                 },
               ),
@@ -147,11 +150,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                             itemCount: grouped[day]!.length,
                             itemBuilder: (context, idx) {
-                              final shot = grouped[day]![idx];
+                              final dayScreenshots = grouped[day]!;
                               return ScreenshotGridItem(
-                                imageFile: shot.file,
-                                timestamp: shot.timestamp,
-                                appName: shot.appName,
+                                screenshots: dayScreenshots.map((s) => ScreenshotDetailData(
+                                  imageFile: s.file,
+                                  timestamp: s.timestamp,
+                                  appName: s.appName,
+                                )).toList(),
+                                index: idx,
                               );
                             },
                           ),
