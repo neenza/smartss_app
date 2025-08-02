@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to display and manage screenshots.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app needs access to your documents folder to display and manage screenshots.</string>
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>This app needs access to your files to display and manage screenshots.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

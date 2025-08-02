@@ -1,0 +1,27 @@
+// FILE: lib/theme_provider.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final themeProvider = ChangeNotifierProvider<ThemeNotifier>((ref) {
+  return ThemeNotifier();
+});
+
+class ThemeNotifier extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode get themeMode => _themeMode;
+
+  int _gridColumns = 2;
+  int get gridColumns => _gridColumns;
+
+  void setThemeMode(ThemeMode mode) {
+    _themeMode = mode;
+    notifyListeners();
+  }
+
+  void setGridColumns(int count) {
+    if (count == 2 || count == 3) {
+      _gridColumns = count;
+      notifyListeners();
+    }
+  }
+}
